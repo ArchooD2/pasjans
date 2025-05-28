@@ -15,8 +15,8 @@ def przetasuj_stos_rezerwowy(stos_r, obecna_karta_idx):
     obecna_karta_idx = -1  # Resetuje indeks do pierwszej karty
     return stos_r, obecna_karta_idx
 
-def win(kolumny):
-    if all((len(kolumna) - niezakryte_karty(kolumna)) == 0 for kolumna in kolumny):
+def win(kolory_listy):
+    if sum(len(kolor) for kolor in kolory_listy) == 52:
         print("Wygrałeś!")
         return True
 
@@ -96,6 +96,9 @@ def ruch(karty_przenoszone, droga, kolumny, numer_kolumny=0, niezakryte=0, cel_k
                 print(f"Przeniesiono kartę {karty_przenoszone} do stosu końcowego \033[91m{karty_przenoszone.kolor}\033[00m.")
             else:
                 print(f"Przeniesiono kartę {karty_przenoszone} do stosu końcowego \033[96m{karty_przenoszone.kolor}\033[00m.")
+        else:
+            system("cls")
+            print(f"Nie można przenieść {karty_przenoszone} do stosu końcowego.")
         return kolumny, obecna_karta_idx
     elif droga == "koń-kol":
         if len(kolumny[cel_kolumna-1]) == 0 and karty_przenoszone.wartosc == "K":
@@ -113,7 +116,7 @@ def ruch(karty_przenoszone, droga, kolumny, numer_kolumny=0, niezakryte=0, cel_k
             print("Nie można przenieść karty do tej kolumny.")
     return kolumny
 
-def main(kolumny, obecna_karta_idx, kolory_listy, stos_r):
+def main(kolumny, obecna_karta_idx, kolory_listy, stos_r, talia):
     # przesuń kartę z kolumny do kolumny, przesuń kartę z kolumny do stosu końcowego, przesuń kartę ze stosu rezerwowego do kolumny, przesuń kartę ze stosu rezerwowego do stosu końcowego, przesuń kartę ze stosu końcowego do kolumny
     while True:
         wyswietl_plansze_gry(kolumny, stos_r, kolory, kolory_listy, obecna_karta_idx)
@@ -212,15 +215,21 @@ def main(kolumny, obecna_karta_idx, kolory_listy, stos_r):
                     print("Nieprawidłowy wybór kolumny.")
             case 7:
                 system("cls")
-                kolumny = [[] for _ in range(7)]
+                for i in kolumny:
+                    i.clear()
+                talia.clear()
                 talia, kolumny = stworzenie_talii()
                 stos_r = talia
-                obecna_karta_idx = -1
-                kolory_listy = [[] for _ in range(4)]
+                for i in kolory_listy:
+                    i.clear()
+                obecna_karta_idx = -1  # Resetuje indeks do pierwszej karty
                 print("Gra została zresetowana.")
-        if win(kolumny):
+            case _:
+                system("cls")
+                print("Nieprawidłowy wybór. Wybierz opcję od 1 do 7.")
+        if win(kolory_listy):
             wyswietl_plansze_gry(kolumny, stos_r, kolory, kolory_listy, obecna_karta_idx)
             break
 
 if __name__ == "__main__":
-    main(kolumny, obecna_karta_idx, kolory_listy, stos_r) 
+    main(kolumny, obecna_karta_idx, kolory_listy, stos_r, talia) 
