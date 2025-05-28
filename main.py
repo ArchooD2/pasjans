@@ -100,9 +100,13 @@ def ruch(karty_przenoszone, droga, kolumny, numer_kolumny=0, niezakryte=0, cel_k
     elif droga == "koń-kol":
         if len(kolumny[cel_kolumna-1]) == 0 and karty_przenoszone.wartosc == "K":
             kolumny[cel_kolumna-1].append(karty_przenoszone)
+            system("cls")
+            print(f"Przeniesiono kartę {karty_przenoszone} do kolumny {cel_kolumna}.")
         elif weryfikacja_ruchu(karty_przenoszone, kolumny[cel_kolumna-1][-1]):
             kolumny[cel_kolumna-1].append(karty_przenoszone)
             kolory_listy[kolory.index(karty_przenoszone.kolor)].remove(karty_przenoszone)
+            system("cls")
+            print(f"Przeniesiono kartę {karty_przenoszone} do kolumny {cel_kolumna}.")
             return kolumny, kolory_listy
         else:
             system("cls")
@@ -119,9 +123,10 @@ def main(kolumny, obecna_karta_idx, kolory_listy, stos_r):
         print("[2] - Przesuń kartę z kolumny do stosu końcowego")
         print("[3] - Przesuń kartę ze stosu rezerwowego do kolumny")
         print("[4] - Przesuń kartę ze stosu rezerwowego do stosu końcowego")
-        print("[5] - Dobierz kartę ze stosu rezerwowego")
+        print(f"[5] - Dobierz kartę ze stosu rezerwowego - pozostały {len(stos_r) - obecna_karta_idx - 1} karty")
         print("[6] - Przesuń kartę ze stosu końcowego do kolumny")
-        wybor = int(input("Wybierz opcję (1-6): "))
+        print("[7] - Rozpocznij grę od nowa")
+        wybor = int(input("Wybierz opcję (1-7): "))
         match wybor:
             case 1:
                 wybor = int(input("Wybierz kolumnę, z której chcesz przesunąć kartę: "))
@@ -142,7 +147,12 @@ def main(kolumny, obecna_karta_idx, kolory_listy, stos_r):
                             else:
                                 print("Nieprawidłowy wybór karty.")
                         karty_przenoszone = kolumna[-1*(niezakryte_count-wybor_karty+1):]
-                        wybor_kolumny = int(input("Do której kolumny chcesz przenieść karty? (1-7): "))
+                        while True:
+                            wybor_kolumny = int(input("Do której kolumny chcesz przenieść karty? (1-7): "))
+                            if wybor_kolumny <= 7 and wybor_kolumny >= 1:
+                                break
+                            else:
+                                print("Nieprawidłowy wybór kolumny.")
                         kolumny = ruch(karty_przenoszone, "kol-kol", kolumny, wybor, niezakryte_count, wybor_kolumny)
                     else:
                         system("cls")
@@ -164,16 +174,24 @@ def main(kolumny, obecna_karta_idx, kolory_listy, stos_r):
                     system("cls")
                     print("Nieprawidłowy wybór kolumny.")
             case 3:
-                wybor = int(input("Wybierz kolumnę, do której chcesz przesunąć kartę: "))
-                if 1 <= wybor <= 7:
-                    kolumna = kolumny[wybor-1]
-                    karta_przenoszona = stos_r[obecna_karta_idx]  # Przenieś ostatnią kartę
-                    kolumny, obecna_karta_idx = ruch(karta_przenoszona, "rez-kol", kolumny, 0, niezakryte_karty(kolumna), wybor, obecna_karta_idx)
-                else:
+                if obecna_karta_idx == -1:
                     system("cls")
-                    print("Nieprawidłowy wybór kolumny.")
+                    print("Nie ma odkrytej karty w stosie rezerwowym.")
+                else:
+                    wybor = int(input("Wybierz kolumnę, do której chcesz przesunąć kartę: "))
+                    if 1 <= wybor <= 7:
+                        kolumna = kolumny[wybor-1]
+                        karta_przenoszona = stos_r[obecna_karta_idx]  # Przenieś ostatnią kartę
+                        kolumny, obecna_karta_idx = ruch(karta_przenoszona, "rez-kol", kolumny, 0, niezakryte_karty(kolumna), wybor, obecna_karta_idx)
+                    else:
+                        system("cls")
+                        print("Nieprawidłowy wybór kolumny.")
             case 4:
-                kolumny, obecna_karta_idx = ruch(stos_r[obecna_karta_idx], "rez-koń", kolumny, 0, 0, 0, obecna_karta_idx)
+                if obecna_karta_idx == -1:
+                    system("cls")
+                    print("Nie ma odkrytej karty w stosie rezerwowym.")
+                else:
+                    kolumny, obecna_karta_idx = ruch(stos_r[obecna_karta_idx], "rez-koń", kolumny, 0, 0, 0, obecna_karta_idx)
             case 5:
                 if obecna_karta_idx == len(stos_r)-1:
                     stos_r, obecna_karta_idx = przetasuj_stos_rezerwowy(stos_r, obecna_karta_idx)
@@ -183,15 +201,23 @@ def main(kolumny, obecna_karta_idx, kolory_listy, stos_r):
             case 6:
                 wybor = int(input("Wybierz stos końcowy, z którego chcesz wziąć kartę (1-4): "))
                 wybor_kolumny = int(input("Wybierz kolumnę, do której chcesz przesunąć kartę: "))
-                if 1 <= wybor_kolumny <= 7 and wybor != None:
+                if 1 <= wybor_kolumny <= 7 and len(kolory_listy[wybor-1]) != 0:
                     kolumna = kolumny[wybor-1]
                     kolumny, kolory_listy = ruch(kolory_listy[wybor-1][-1], "koń-kol", kolumny, 0, 0, wybor_kolumny)
-                elif kolory_listy[wybor-1] == None:
+                elif len(kolory_listy[wybor-1]) == 0:
                     system("cls")
                     print("Nie ma kart w tym stosie końcowym.")
                 elif 1 > wybor_kolumny or wybor_kolumny > 7:
                     system("cls")
                     print("Nieprawidłowy wybór kolumny.")
+            case 7:
+                system("cls")
+                kolumny = [[] for _ in range(7)]
+                talia, kolumny = stworzenie_talii()
+                stos_r = talia
+                obecna_karta_idx = -1
+                kolory_listy = [[] for _ in range(4)]
+                print("Gra została zresetowana.")
         if win(kolumny):
             wyswietl_plansze_gry(kolumny, stos_r, kolory, kolory_listy, obecna_karta_idx)
             break
