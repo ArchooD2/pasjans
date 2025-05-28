@@ -49,12 +49,11 @@ def wyswietl_stos_rezerwowy(stos_r, obecna_karta_idx=0):
     if not stos_r:  
         print("[Pusty stos rezerwowy]   ", end="")
         return
-    
     if obecna_karta_idx > -1 and obecna_karta_idx < len(stos_r):
-        if obecna_karta_idx < len(stos_r):
+        if obecna_karta_idx + 1 < len(stos_r):
             print("[???]", end=" ")
-        else:
-            print("", end="    ")
+        elif obecna_karta_idx + 1 == len(stos_r):
+            print("", end="")
         stos_r[obecna_karta_idx].zakryta = False  # odkrywa kartę
         print(stos_r[obecna_karta_idx], end="     ")
         if obecna_karta_idx == len(stos_r):
