@@ -1,7 +1,6 @@
 from board import *
 from os import system
 
-r.seed(69424) # Ustawienie ziarna dla powtarzalności wyników
 wartosci = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
 kolory = ["♥","♠","♦","♣"]
 talia, kolumny = stworzenie_talii()
